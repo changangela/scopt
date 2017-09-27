@@ -43,7 +43,7 @@ lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
-      val g = "https://raw.githubusercontent.com/scopt/scopt/" + sys.process.Process("git rev-parse HEAD").lines_!.head
+      val g = "https://raw.githubusercontent.com/scopt/scopt/" + sys.process.Process("git rev-parse HEAD").lineStream_!.head
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     sources in Test := {
@@ -64,10 +64,16 @@ lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(
   )
 
 lazy val scoptJS = scopt.js
-lazy val scoptJVM = scopt.jvm.enablePlugins(SiteScaladocPlugin)
+lazy val scoptJVM = scopt.jvm.settings(dottySettings)
 lazy val scoptNative = scopt.native
 
 lazy val nativeTest = project.in(file("nativeTest")).
   dependsOn(scoptNative).
   enablePlugins(ScalaNativePlugin).
   settings(scalaVersion := scala211)
+
+lazy val dottySettings = List(
+  scalaVersion := dottyLatestNightlyBuild.get,
+  libraryDependencies := libraryDependencies.value.map(_.withDottyCompat(scalaVersion.value)),
+  scalacOptions := List("-language:Scala2")
+)
