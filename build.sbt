@@ -73,7 +73,6 @@ lazy val nativeTest = project.in(file("nativeTest")).
   settings(scalaVersion := scala211)
 
 lazy val dottySettings = List(
-  scalaVersion := dottyLatestNightlyBuild.get,
   libraryDependencies := libraryDependencies.value.map(_.withDottyCompat(scalaVersion.value)),
   scalacOptions := List("-language:Scala2")
 )
