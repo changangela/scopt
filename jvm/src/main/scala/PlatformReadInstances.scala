@@ -4,7 +4,8 @@ import java.net.{ URL, UnknownHostException }
 import collection.{ Seq => CSeq }
 
 private[scopt] object platform {
-  val _NL = System.getProperty("line.separator")
+  // java.lang.System.getProperty | SM | Documentation unclear, should be non-nullable.
+  val _NL = System.getProperty("line.separator").nn
 
   import java.util.{ Locale, Calendar, GregorianCalendar }
   import java.text.SimpleDateFormat
@@ -12,10 +13,11 @@ private[scopt] object platform {
   import java.net.{ InetAddress, URI }
 
   type ParseException = java.text.ParseException
-  def mkParseEx(s: String, p: Int) = new java.text.ParseException(s, p)
+  def mkParseEx(s: String | Null, p: Int) = new java.text.ParseException(s, p)
 
   trait PlatformReadInstances {
-    def calendarRead(pattern: String): Read[Calendar] = calendarRead(pattern, Locale.getDefault)
+    // java.util.Locale.getDefault | SM | Documentation unclear, but should be non-nullable.
+    def calendarRead(pattern: String): Read[Calendar] = calendarRead(pattern, Locale.getDefault.nn)
     def calendarRead(pattern: String, locale: Locale): Read[Calendar] =
       Read.reads { s =>
         val fmt = new SimpleDateFormat(pattern)
@@ -26,7 +28,8 @@ private[scopt] object platform {
 
     implicit val yyyymmdddRead: Read[Calendar] = calendarRead("yyyy-MM-dd")
     implicit val fileRead: Read[File] = Read.reads { new File(_) }
-    implicit val inetAddress: Read[InetAddress] = Read.reads { InetAddress.getByName(_) }
+    // java.net.InetAddress.getByName | SM | Documentation unclear, but should be non-nullable.
+    implicit val inetAddress: Read[InetAddress] = Read.reads { InetAddress.getByName(_).nn }
     implicit val uriRead: Read[URI] = Read.reads { new URI(_) }
     implicit val urlRead: Read[URL] = Read.reads { new URL(_) }
   }

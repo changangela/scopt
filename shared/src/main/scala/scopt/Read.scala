@@ -97,25 +97,30 @@ object Read extends platform.PlatformReadInstances {
 
   // reads("1,2,3,4,5") == Seq(1,2,3,4,5)
   implicit def seqRead[A: Read]: Read[CSeq[A]] = reads { (s: String) =>
-    s.split(sep).toList.map(implicitly[Read[A]].reads)
+    // java toList returns a list of nullable elements
+    s.split(sep).toList.map(x => implicitly[Read[A]].reads(x.nn))
   }
   // reads("1,2,3,4,5") == List(1,2,3,4,5)
   implicit def immutableSeqRead[A: Read]: Read[ISeq[A]] = reads { (s: String) =>
-    s.split(sep).toList.map(implicitly[Read[A]].reads)
+    // java toList returns a list of nullable elements
+    s.split(sep).toList.map(x => implicitly[Read[A]].reads(x.nn))
   }
 
   // reads("1=false,2=true") == Map(1 -> false, 2 -> true)
   implicit def mapRead[K: Read, V: Read]: Read[Map[K, V]] = reads { (s: String) =>
-    s.split(sep).map(implicitly[Read[(K, V)]].reads).toMap
+    // java toList returns a list of nullable elements
+    s.split(sep).map(x => implicitly[Read[(K, V)]].reads(x.nn)).toMap
   }
 
   // reads("1=false,1=true") == List((1 -> false), (1 -> true))
   implicit def seqTupleRead[K: Read, V: Read]: Read[CSeq[(K, V)]] = reads { (s: String) =>
-    s.split(sep).map(implicitly[Read[(K, V)]].reads).toList
+    // java toList returns a list of nullable elements
+    s.split(sep).map(x => implicitly[Read[(K, V)]].reads(x.nn)).toList
   }
   // reads("1=false,1=true") == List((1 -> false), (1 -> true))
   implicit def immutableSeqTupleRead[K: Read, V: Read]: Read[ISeq[(K, V)]] = reads { (s: String) =>
-    s.split(sep).map(implicitly[Read[(K, V)]].reads).toList
+    // java toList returns a list of nullable elements
+    s.split(sep).map(x => implicitly[Read[(K, V)]].reads(x.nn)).toList
   }
 
   implicit def optionRead[A: Read]: Read[Option[A]] = reads {
