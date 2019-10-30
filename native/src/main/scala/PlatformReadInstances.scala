@@ -5,7 +5,8 @@ import java.net.UnknownHostException
 import collection.{ Seq => CSeq }
 
 private[scopt] object platform {
-  val _NL = System.getProperty("line.separator")
+  // java.lang.System.getProperty | SM | Documentation unclear, should be non-nullable.
+  val _NL = System.getProperty("line.separator").nn
 
   type ParseException = Exception
   def mkParseEx(s: String, p: Int) = new Exception(s"$s at $p")
